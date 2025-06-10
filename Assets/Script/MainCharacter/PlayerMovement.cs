@@ -9,6 +9,15 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private Vector2 lastMoveDirection = Vector2.down;
 
+    public HealthBar healthBar;
+
+
+    void Start()
+    {
+        PlayerData.Instance.currentHealth = PlayerData.Instance.maxHealth;
+    }
+
+
     void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
@@ -28,6 +37,11 @@ public class PlayerMovement : MonoBehaviour
         // Simpan arah terakhir
         animator.SetFloat("LastHorizontal", lastMoveDirection.x);
         animator.SetFloat("LastVertical", lastMoveDirection.y);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            PlayerData.Instance.TakeDamage(1);
+        }
     }
 
     void FixedUpdate()
