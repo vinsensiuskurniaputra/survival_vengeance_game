@@ -7,7 +7,7 @@ public class PlayerData : MonoBehaviour
     public static PlayerData Instance;
     public Animator animator;
 
-    public int maxHealth = 3;
+    public int maxHealth = 100;
     public int currentHealth;
 
     public List<string> items = new List<string>();
@@ -32,6 +32,7 @@ public class PlayerData : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        animator.SetTrigger("Hit");
         if (currentHealth <= 0)
         {
             currentHealth = 0;
