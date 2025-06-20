@@ -1,10 +1,13 @@
 using UnityEngine;
+using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
     public int maxHealth = 3;
     private int currentHealth;
     private Animator animator;
+    public GameObject expPrefab;
+    public Transform dropPoint;
 
     private bool isDead = false;
 
@@ -39,7 +42,19 @@ public class EnemyHealth : MonoBehaviour
         GetComponent<Collider2D>().enabled = false;
         GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
 
+        StartCoroutine(DropExpWithDelay(1f));
+
         // Optionally: Destroy after delay
         Destroy(gameObject, 5f);
+    }
+
+    IEnumerator DropExpWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (expPrefab != null)
+        {
+            Instantiate(expPrefab, dropPoint != null ? dropPoint.position : transform.position, Quaternion.identity);
+        }
     }
 }

@@ -9,6 +9,8 @@ public class PlayerData : MonoBehaviour
 
     public int maxHealth = 100;
     public int currentHealth;
+    public int exp = 0;
+    public int attackPower = 1;
 
     public List<string> items = new List<string>();
 
@@ -48,5 +50,21 @@ public class PlayerData : MonoBehaviour
             items.Add(itemName);
             Debug.Log("Item ditambahkan: " + itemName);
         }
+    }
+
+    public void AddExp(int amount)
+    {
+        exp += amount;
+        Debug.Log("EXP sekarang: " + exp);
+    }
+
+    public bool SpendExp(int cost)
+    {
+        if (exp >= cost)
+        {
+            exp -= cost;
+            return true;
+        }
+        return false;
     }
 }

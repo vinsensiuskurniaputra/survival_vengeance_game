@@ -76,13 +76,14 @@ public class PlayerMovement : MonoBehaviour
         {
             EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
             BossHealth bossHealth = enemy.GetComponent<BossHealth>();
+            int damage = PlayerData.Instance.attackPower;
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(1); // You can customize the damage amount
+                enemyHealth.TakeDamage(damage);
             }
             if (bossHealth != null)
             {
-                bossHealth.TakeDamage(1);
+                bossHealth.TakeDamage(damage);
             }
         }
     }
