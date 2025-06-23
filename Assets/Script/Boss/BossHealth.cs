@@ -6,6 +6,7 @@ public class BossHealth : MonoBehaviour
     private int currentHealth;
     private Animator animator;
     public BossHealthBarUI healthBar;
+    public EnemySpawnerBoss bossSpawner;
 
     private bool isDead = false;
 
@@ -50,6 +51,7 @@ public class BossHealth : MonoBehaviour
             healthBar.IsDead = true; // ini penting
                                      // healthBar.gameObject.SetActive(false); // tidak perlu lagi
         }
+        bossSpawner?.DeactivateSpawner();
 
         // Optionally: Destroy after delay
         //Destroy(gameObject, 5f);

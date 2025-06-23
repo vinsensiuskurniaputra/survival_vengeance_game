@@ -2,16 +2,17 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;          // Prefab musuh yang akan dipanggil
+    public GameObject[] enemyPrefabs;       // Array dari berbagai prefab musuh
     public Transform[] spawnPoints;         // Titik-titik tempat spawn musuh
     public float spawnInterval = 3f;        // Waktu antar spawn
     public int maxEnemy = 10;
     public int currentEnemy = 0;
 
     private float timer;
+
     void Start()
     {
-        this.enabled = false; // Disabled by default
+        this.enabled = false; // Dinonaktifkan di awal, aktif via trigger jika perlu
     }
 
     void Update()
@@ -27,12 +28,22 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnEnemy()
     {
-        if (spawnPoints.Length == 0 || enemyPrefab == null || currentEnemy >= maxEnemy ) return;
+        if (enemyPrefabs.Length == 0 || spawnPoints.Length == 0 || currentEnemy >= maxEnemy)
+            return;
 
-        int index = Random.Range(0, spawnPoints.Length);
-        Transform spawnPoint = spawnPoints[index];
+        // Pilih spawn point dan prefab secara acak
+        int pointIndex = Random.Range(0, spawnPoints.Length);
+        int prefabIndex = Random.Range(0, enemyPrefabs.Length);
 
-        currentEnemy += 1;
-        Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+        Transform spawnPoint = spawnPoints[pointIndex];
+        GameObject prefabToSpawn = enemyPrefabs[prefabIndex];
+
+        Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
+        currentEnemy++;
+    }
+
+    public void OnEnemyKilled()
+    {
+        currentEnemy = Mathf.Max(0, currentEnemy - 1);
     }
 }

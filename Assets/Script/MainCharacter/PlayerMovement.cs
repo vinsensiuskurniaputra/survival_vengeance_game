@@ -1,8 +1,8 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f;
     public Rigidbody2D rb;
     public Animator animator;
 
@@ -12,8 +12,10 @@ public class PlayerMovement : MonoBehaviour
     public HealthBar healthBar;
     public float attackRange = 1f;
     public LayerMask enemyLayer;
+    public LayerMask gateLayer;
     public GameObject attackEffectPrefab; // <- Tambahkan ini
     public float effectDuration = 0.3f;   // <- Durasi efek animasi sebelum dihancurkan
+    public UpgradeManager upgradeManager;
 
 
     void Start()
@@ -46,16 +48,40 @@ public class PlayerMovement : MonoBehaviour
         {
             Attack();
         }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            upgradeManager.ToggleUpgradeMenu();
+        }
+
+        // Shortcut saat panel aktif
+        if (upgradeManager.upgradePanel.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                upgradeManager.UpgradeMaxHP();
+            }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                upgradeManager.UpgradeAttack();
+            }
+            else if (Input.GetKeyDown(KeyCode.F))
+            {
+                upgradeManager.HealFull();
+            }
+            else if (Input.GetKeyDown(KeyCode.T))
+            {
+                upgradeManager.UpgradeSpeed();
+            }
+        }
     }
 
     void FixedUpdate()
     {
         // Gerakkan karakter
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + movement * PlayerData.Instance.moveSpeed * Time.fixedDeltaTime);
     }
     void Attack()
     {
-        // Find enemies in front of player
         Vector2 attackDir = lastMoveDirection.normalized;
         Vector2 attackOrigin = rb.position + attackDir * 0.5f;
 
@@ -63,29 +89,45 @@ public class PlayerMovement : MonoBehaviour
         if (attackEffectPrefab != null)
         {
             GameObject effect = Instantiate(attackEffectPrefab, attackOrigin, Quaternion.identity);
-            
-            // Optional: rotate based on direction
             float angle = Mathf.Atan2(attackDir.y, attackDir.x) * Mathf.Rad2Deg;
             effect.transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-            Destroy(effect, effectDuration); // Auto-destroy
+            Destroy(effect, effectDuration);
         }
 
+        // === Serang musuh ===
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackOrigin, attackRange, enemyLayer);
         foreach (Collider2D enemy in hitEnemies)
         {
             EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
             BossHealth bossHealth = enemy.GetComponent<BossHealth>();
-            int damage = PlayerData.Instance.attackPower;
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(damage);
+                enemyHealth.TakeDamage(PlayerData.Instance.attackPower);
             }
             if (bossHealth != null)
             {
-                bossHealth.TakeDamage(damage);
+                bossHealth.TakeDamage(PlayerData.Instance.attackPower);
             }
         }
+
+        // === Serang Gate (GameObject) ===
+        Collider2D[] hitGates = Physics2D.OverlapCircleAll(attackOrigin, attackRange, gateLayer);
+        foreach (Collider2D gate in hitGates)
+        {
+            GateHealth gateHealth = gate.GetComponent<GateHealth>();
+            if (gateHealth != null)
+            {
+                gateHealth.TakeDamage(1);
+                Debug.Log("Gate attacked!");
+            }
+            else
+            {
+                Debug.Log("Gate Not attacked!");
+            }
+
+        }
+
+        
     }
     void OnDrawGizmosSelected()
     {

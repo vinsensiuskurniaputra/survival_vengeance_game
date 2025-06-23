@@ -83,11 +83,7 @@ public class BossMovement : MonoBehaviour
         Collider2D hitPlayer = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
         if (hitPlayer != null)
         {
-            PlayerData playerData = hitPlayer.GetComponent<PlayerData>();
-            if (playerData != null)
-            {
-                playerData.TakeDamage(damage);
-            }
+            PlayerData.Instance.TakeDamage(damage);
         }
     }
 

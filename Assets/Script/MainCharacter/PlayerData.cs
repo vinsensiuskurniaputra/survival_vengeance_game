@@ -5,14 +5,16 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     public static PlayerData Instance;
-    public Animator animator;
 
     public int maxHealth = 100;
     public int currentHealth;
     public int exp = 0;
     public int attackPower = 1;
+    public float moveSpeed = 5f;
 
     public List<string> items = new List<string>();
+
+    private Animator animator; // Jangan isi manual
 
     void Awake()
     {
@@ -29,17 +31,40 @@ public class PlayerData : MonoBehaviour
         currentHealth = maxHealth;
     }
 
+    void Update()
+    {
+        // Jika animator belum di-set, cari dari GameObject player di scene
+        if (animator == null)
+        {
+            GameObject playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+            {
+                animator = playerObj.GetComponent<Animator>();
+            }
+        }
+    }
+
     public float HealthPercent => (float)currentHealth / maxHealth;
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        animator.SetTrigger("Hit");
+
+        if (animator != null)
+        {
+            animator.SetTrigger("Hit");
+        }
+
         if (currentHealth <= 0)
         {
             currentHealth = 0;
             Debug.Log("Player mati");
-            animator.SetBool("IsDead", true);
+
+            if (animator != null)
+            {
+                animator.SetBool("IsDead", true);
+            }
+            GameManager.Instance.GameOver();
         }
     }
 

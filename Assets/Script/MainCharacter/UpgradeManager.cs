@@ -14,7 +14,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void UpgradeMaxHP()
     {
-        int cost = 2;
+        int cost = 20;
         if (PlayerData.Instance.SpendExp(cost))
         {
             PlayerData.Instance.maxHealth += 10;
@@ -29,7 +29,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void UpgradeAttack()
     {
-        int cost = 1;
+        int cost = 30;
         if (PlayerData.Instance.SpendExp(cost))
         {
             PlayerData.Instance.attackPower += 2;
@@ -43,11 +43,25 @@ public class UpgradeManager : MonoBehaviour
 
     public void HealFull()
     {
-        int cost = 1;
+        int cost = 5;
         if (PlayerData.Instance.SpendExp(cost))
         {
             PlayerData.Instance.currentHealth = PlayerData.Instance.maxHealth;
             feedbackText.text = "Fully healed!";
+        }
+        else
+        {
+            feedbackText.text = "Not enough EXP!";
+        }
+    }
+
+    public void UpgradeSpeed()
+    {
+        int cost = 25;
+        if (PlayerData.Instance.SpendExp(cost))
+        {
+            PlayerData.Instance.moveSpeed += 1f;
+            feedbackText.text = "Speed increased!";
         }
         else
         {
