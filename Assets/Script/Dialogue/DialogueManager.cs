@@ -1,109 +1,115 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Penting: Tambahkan ini untuk mengakses komponen Button
-using UnityEngine.Events; // Sangat Penting: Untuk sistem event
+using UnityEngine.UI;
+using UnityEngine.Events;
 using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
-    // === Referensi UI (dengan tambahan tombol) ===
+    // === Referensi UI (diisi dari Inspector) ===
     public GameObject dialoguePanel;
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI dialogueText;
     public Button nextButton;
     public Button continueButton;
+
+    // === Pengaturan (diisi dari Inspector) ===
     [Tooltip("Kecepatan munculnya huruf per detik. Angka kecil = cepat.")]
-    public float typingSpeed = 0.04f; 
+    public float typingSpeed = 0.04f;
     [Header("Pengaturan Audio")]
     public AudioSource backgroundMusicSource;
     [Range(0, 1)]
     public float volumeSaatDialog = 0.1f;
     public float audioFadeDuration = 1.0f;
 
-    // === Variabel Internal ===
-    private Queue<string> sentences;
+    // === Variabel Internal (untuk logika sistem) ===
+    private Queue<Sentence> conversationQueue;
     private Coroutine typingCoroutine;
     private string currentFullSentence;
     private UnityAction onDialogueFinishAction;
     private float originalVolume;
     private Coroutine audioFadeCoroutine;
+    private bool isChangingMusic = false;
     private bool isConversationActive = false;
 
     void Start()
     {
-        sentences = new Queue<string>();
+        conversationQueue = new Queue<Sentence>();
         dialoguePanel.SetActive(false);
-
-        // Menghubungkan fungsi ke tombol secara dinamis
         nextButton.onClick.AddListener(OnNextButtonClicked);
         continueButton.onClick.AddListener(OnContinueButtonClicked);
     }
-    
-    // Fungsi ini dipanggil dari luar (oleh trigger)
+
+    // --- FUNGSI UTAMA ---
+
     public void StartDialogue(Dialogue dialogue, UnityAction onFinish)
     {
-        
-        if (!isConversationActive)
+        // Cek jika ini awal percakapan DAN musik tidak sedang diganti
+        if (!isConversationActive && !isChangingMusic)
         {
-            isConversationActive = true; // Tandai sesi percakapan dimulai
-
-            // Blok audio ini HANYA akan berjalan untuk dialog pertama
+            isConversationActive = true;
             if (backgroundMusicSource != null)
             {
-                originalVolume = backgroundMusicSource.volume; // Simpan volume ASLI
-
-                if(audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
+                originalVolume = backgroundMusicSource.volume;
+                if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
                 audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, volumeSaatDialog, audioFadeDuration));
             }
+        }
+        else if (!isConversationActive)
+        {
+            // Jika ini dialog pertama tapi musik sedang diganti, cukup tandai sesi aktif
+            isConversationActive = true;
         }
 
         dialoguePanel.SetActive(true);
         nextButton.gameObject.SetActive(true);
         continueButton.gameObject.SetActive(false);
 
-        onDialogueFinishAction = onFinish; // Simpan aksi yang harus dijalankan setelah selesai
+        onDialogueFinishAction = onFinish;
 
-        nameText.text = dialogue.name;
-        sentences.Clear();
-
-        foreach (string sentence in dialogue.sentences)
+        conversationQueue.Clear();
+        foreach (Sentence line in dialogue.conversationLines)
         {
-            sentences.Enqueue(sentence);
+            conversationQueue.Enqueue(line);
         }
 
         DisplayNextSentence();
     }
 
-    
-    public IEnumerator FadeAudio(AudioSource audioSource, float targetVolume, float duration)
+    private void DisplayNextSentence()
     {
-        float currentTime = 0;
-        float startVolume = audioSource.volume;
-
-        // Loop akan berjalan selama durasi yang ditentukan
-        while (currentTime < duration)
+        if (conversationQueue.Count == 0)
         {
-            // Tambah waktu berdasarkan waktu frame
-            currentTime += Time.deltaTime; 
-
-            // Hitung volume baru menggunakan Lerp (Linear Interpolation)
-            // Lerp akan mencari nilai di antara startVolume dan targetVolume
-            audioSource.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / duration);
-
-            // Tunggu frame berikutnya sebelum melanjutkan loop
-            yield return null; 
+            dialogueText.text = currentFullSentence;
+            nextButton.gameObject.SetActive(false);
+            continueButton.gameObject.SetActive(true);
+            return;
         }
 
-        // Pastikan volume diatur ke nilai target di akhir
-        audioSource.volume = targetVolume; 
-        audioFadeCoroutine = null;
+        Sentence currentLine = conversationQueue.Dequeue();
+        nameText.text = currentLine.speakerName;
+        currentFullSentence = currentLine.text;
+
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        typingCoroutine = StartCoroutine(TypeSentence(currentLine.text));
     }
 
-    // Fungsi ini terhubung ke OnClick milik NextButton
+    void EndDialogue()
+    {
+        dialoguePanel.SetActive(false);
+        if (onDialogueFinishAction != null)
+        {
+            onDialogueFinishAction.Invoke();
+        }
+        StopCoroutine("CheckConversationEnd");
+        StartCoroutine("CheckConversationEnd");
+    }
+
+    // --- FUNGSI UNTUK TOMBOL ---
+
     public void OnNextButtonClicked()
     {
-        // Jika sedang mengetik, selesaikan. Jika tidak, tampilkan kalimat berikutnya.
         if (typingCoroutine != null)
         {
             CompleteSentence();
@@ -114,41 +120,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Fungsi ini terhubung ke OnClick milik ContinueButton
     public void OnContinueButtonClicked()
     {
         EndDialogue();
     }
 
-    // Tambahkan fungsi baru ini di mana saja di dalam kelas DialogueManager
-    public void EndConversation()
-    {
-        isConversationActive = false; // Tandai sesi percakapan selesai
+    // --- LOGIKA EFEK KETIKAN ---
 
-        if (backgroundMusicSource != null)
-        {
-            // Kembalikan volume ke aslinya
-            if(audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
-            audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, originalVolume, audioFadeDuration));
-        }
-    }
-    
-    private void DisplayNextSentence()
-    {
-        // Jika tidak ada kalimat lagi
-        if (sentences.Count == 0)
-        {
-            dialogueText.text = currentFullSentence; // Pastikan kalimat terakhir utuh
-            nextButton.gameObject.SetActive(false);
-            continueButton.gameObject.SetActive(true); // Tampilkan tombol Selesai
-            return;
-        }
-
-        currentFullSentence = sentences.Dequeue();
-        typingCoroutine = StartCoroutine(TypeSentence(currentFullSentence));
-    }
-
-    IEnumerator TypeSentence(string sentence)
+    private IEnumerator TypeSentence(string sentence)
     {
         dialogueText.text = "";
         foreach (char letter in sentence.ToCharArray())
@@ -156,10 +135,10 @@ public class DialogueManager : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
-        typingCoroutine = null; // Tandai bahwa ketikan selesai
+        typingCoroutine = null;
     }
 
-    void CompleteSentence()
+    private void CompleteSentence()
     {
         if (typingCoroutine != null)
         {
@@ -169,36 +148,63 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = currentFullSentence;
     }
 
-    void EndDialogue()
+    // --- LOGIKA AUDIO ---
+
+    public void ChangeBackgroundMusic(AudioClip newMusic)
     {
-        dialoguePanel.SetActive(false);
-        
-        if (onDialogueFinishAction != null)
-        {
-            onDialogueFinishAction.Invoke();
-        }
-        
-        // Hentikan coroutine pemeriksa yang lama jika ada, lalu mulai yang baru
-        StopCoroutine("CheckConversationEnd"); // Hentikan dengan nama string
-        StartCoroutine("CheckConversationEnd");
+        StartCoroutine(FadeAndChangeMusic(newMusic));
     }
 
-    // Coroutine kecil untuk memeriksa status di frame berikutnya
-    IEnumerator CheckConversationEnd()
+    private IEnumerator FadeAndChangeMusic(AudioClip newMusic)
     {
-        // Tunggu satu frame. Ini memberi waktu untuk StartDialogue() berikutnya dipanggil.
-        yield return null; 
+        isChangingMusic = true;
 
-        // Setelah satu frame, kita cek: Apakah panel dialog masih non-aktif?
-        // Jika ya, berarti tidak ada dialog baru yang dipicu. Inilah akhir sebenarnya.
+        if (backgroundMusicSource != null && backgroundMusicSource.isPlaying)
+        {
+            if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
+            audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, 0f, audioFadeDuration));
+            yield return audioFadeCoroutine;
+        }
+
+        if (backgroundMusicSource != null)
+        {
+            backgroundMusicSource.Stop();
+            backgroundMusicSource.clip = newMusic;
+            backgroundMusicSource.Play();
+            float targetVolume = (originalVolume > 0) ? originalVolume : 1.0f;
+            if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
+            audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, targetVolume, audioFadeDuration));
+            yield return audioFadeCoroutine;
+        }
+
+        isChangingMusic = false;
+    }
+
+    private IEnumerator FadeAudio(AudioSource audioSource, float targetVolume, float duration)
+    {
+        float currentTime = 0;
+        float startVolume = audioSource.volume;
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / duration);
+            yield return null;
+        }
+        audioSource.volume = targetVolume;
+        audioFadeCoroutine = null;
+    }
+
+    // --- LOGIKA AKHIR PERCAKAPAN ---
+
+    private IEnumerator CheckConversationEnd()
+    {
+        yield return null;
         if (!dialoguePanel.activeSelf && isConversationActive)
         {
-            isConversationActive = false; // Reset status
-
-            // Kembalikan volume audio
+            isConversationActive = false;
             if (backgroundMusicSource != null)
             {
-                if(audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
+                if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
                 audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, originalVolume, audioFadeDuration));
             }
         }
