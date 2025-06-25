@@ -13,8 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public float attackRange = 1f;
     public LayerMask enemyLayer;
     public LayerMask gateLayer;
-    public GameObject attackEffectPrefab; // <- Tambahkan ini
-    public float effectDuration = 0.3f;   // <- Durasi efek animasi sebelum dihancurkan
+    public GameObject attackEffectPrefab;
+    public float effectDuration = 0.3f;
     public UpgradeManager upgradeManager;
 
 
@@ -26,6 +26,19 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // Cek apakah dialog sedang aktif, jika ya maka skip semua input
+        // (Ini sebenarnya tidak diperlukan lagi karena Time.timeScale = 0, 
+        // tapi tetap bisa digunakan untuk keamanan ekstra)
+        if (DialogueManager.IsDialogueActive)
+        {
+            // Reset movement agar player berhenti
+            movement = Vector2.zero;
+            animator.SetFloat("Horizontal", 0);
+            animator.SetFloat("Vertical", 0);
+            animator.SetFloat("Speed", 0);
+            return; // Skip semua input lainnya
+        }
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -64,11 +77,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 upgradeManager.UpgradeAttack();
             }
-            else if (Input.GetKeyDown(KeyCode.F))
+            else if (Input.GetKeyDown(KeyCode.T))
             {
                 upgradeManager.HealFull();
             }
-            else if (Input.GetKeyDown(KeyCode.T))
+            else if (Input.GetKeyDown(KeyCode.Y))
             {
                 upgradeManager.UpgradeSpeed();
             }
@@ -77,6 +90,9 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Tidak perlu cek DialogueManager.IsDialogueActive lagi karena Time.timeScale = 0
+        // akan otomatis menghentikan FixedUpdate
+        
         // Gerakkan karakter
         rb.MovePosition(rb.position + movement * PlayerData.Instance.moveSpeed * Time.fixedDeltaTime);
     }

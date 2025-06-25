@@ -32,6 +32,10 @@ public class DialogueManager : MonoBehaviour
     private Coroutine audioFadeCoroutine;
     private bool isChangingMusic = false;
     private bool isConversationActive = false;
+    
+    // === Variabel untuk pause game ===
+    public static bool IsDialogueActive { get; private set; } = false;
+    private float originalTimeScale = 1f;
 
     void Start()
     {
@@ -39,12 +43,19 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(false);
         nextButton.onClick.AddListener(OnNextButtonClicked);
         continueButton.onClick.AddListener(OnContinueButtonClicked);
+        
+        // Simpan time scale asli
+        originalTimeScale = Time.timeScale;
     }
 
-    // --- FUNGSI UTAMA ---
+    // === FUNGSI UTAMA ===
 
     public void StartDialogue(Dialogue dialogue, UnityAction onFinish)
     {
+        // Pause game saat dialog dimulai
+        IsDialogueActive = true;
+        Time.timeScale = 0f; // Pause seluruh game
+        
         // Cek jika ini awal percakapan DAN musik tidak sedang diganti
         if (!isConversationActive && !isChangingMusic)
         {
@@ -97,6 +108,10 @@ public class DialogueManager : MonoBehaviour
 
     void EndDialogue()
     {
+        // Resume game saat dialog selesai
+        IsDialogueActive = false;
+        Time.timeScale = originalTimeScale; // Resume game
+        
         dialoguePanel.SetActive(false);
         if (onDialogueFinishAction != null)
         {
@@ -106,7 +121,7 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine("CheckConversationEnd");
     }
 
-    // --- FUNGSI UNTUK TOMBOL ---
+    // === FUNGSI UNTUK TOMBOL ===
 
     public void OnNextButtonClicked()
     {
@@ -125,7 +140,7 @@ public class DialogueManager : MonoBehaviour
         EndDialogue();
     }
 
-    // --- LOGIKA EFEK KETIKAN ---
+    // === LOGIKA EFEK KETIKAN ===
 
     private IEnumerator TypeSentence(string sentence)
     {
@@ -133,7 +148,8 @@ public class DialogueManager : MonoBehaviour
         foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
+            // Gunakan WaitForSecondsRealtime agar tidak terpengaruh Time.timeScale
+            yield return new WaitForSecondsRealtime(typingSpeed);
         }
         typingCoroutine = null;
     }
@@ -148,7 +164,7 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = currentFullSentence;
     }
 
-    // --- LOGIKA AUDIO ---
+    // === LOGIKA AUDIO ===
 
     public void ChangeBackgroundMusic(AudioClip newMusic)
     {
@@ -159,22 +175,19 @@ public class DialogueManager : MonoBehaviour
     {
         isChangingMusic = true;
 
-        if (backgroundMusicSource != null && backgroundMusicSource.isPlaying)
+        if (backgroundMusicSource != null)
         {
+            originalVolume = backgroundMusicSource.volume;
             if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
             audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, 0f, audioFadeDuration));
             yield return audioFadeCoroutine;
-        }
 
-        if (backgroundMusicSource != null)
-        {
-            backgroundMusicSource.Stop();
             backgroundMusicSource.clip = newMusic;
             backgroundMusicSource.Play();
-            float targetVolume = (originalVolume > 0) ? originalVolume : 1.0f;
+
+            float targetVolume = isConversationActive ? volumeSaatDialog : originalVolume;
             if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
             audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, targetVolume, audioFadeDuration));
-            yield return audioFadeCoroutine;
         }
 
         isChangingMusic = false;
@@ -186,7 +199,8 @@ public class DialogueManager : MonoBehaviour
         float startVolume = audioSource.volume;
         while (currentTime < duration)
         {
-            currentTime += Time.deltaTime;
+            // Gunakan Time.unscaledDeltaTime agar tidak terpengaruh Time.timeScale
+            currentTime += Time.unscaledDeltaTime;
             audioSource.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / duration);
             yield return null;
         }
@@ -207,6 +221,16 @@ public class DialogueManager : MonoBehaviour
                 if (audioFadeCoroutine != null) StopCoroutine(audioFadeCoroutine);
                 audioFadeCoroutine = StartCoroutine(FadeAudio(backgroundMusicSource, originalVolume, audioFadeDuration));
             }
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Safety: pastikan time scale kembali normal saat object dihancurkan
+        if (IsDialogueActive)
+        {
+            Time.timeScale = originalTimeScale;
+            IsDialogueActive = false;
         }
     }
 }
