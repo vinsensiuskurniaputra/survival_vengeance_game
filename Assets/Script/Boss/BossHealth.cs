@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class BossHealth : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class BossHealth : MonoBehaviour
     private Animator animator;
     public BossHealthBarUI healthBar;
     public EnemySpawnerBoss bossSpawner;
+    public GameObject expPrefab;
+    public Transform dropPoint;
 
     private bool isDead = false;
 
@@ -52,8 +55,18 @@ public class BossHealth : MonoBehaviour
                                      // healthBar.gameObject.SetActive(false); // tidak perlu lagi
         }
         bossSpawner?.DeactivateSpawner();
+        StartCoroutine(DropExpWithDelay(1f));
 
         // Optionally: Destroy after delay
         //Destroy(gameObject, 5f);
+    }
+    IEnumerator DropExpWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (expPrefab != null)
+        {
+            Instantiate(expPrefab, dropPoint != null ? dropPoint.position : transform.position, Quaternion.identity);
+        }
     }
 }

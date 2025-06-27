@@ -17,6 +17,12 @@ public class PlayerMovement : MonoBehaviour
     public float effectDuration = 0.3f;
     public UpgradeManager upgradeManager;
 
+    public GameObject projectilePrefab;
+    public Transform firePoint;
+
+    private float lastProjectileTime = -999f;
+
+
 
     void Start()
     {
@@ -86,6 +92,11 @@ public class PlayerMovement : MonoBehaviour
                 upgradeManager.UpgradeSpeed();
             }
         }
+
+        if (Input.GetMouseButtonDown(0)) // klik kiri
+        {
+            ShootProjectile();
+        }
     }
 
     void FixedUpdate()
@@ -145,6 +156,20 @@ public class PlayerMovement : MonoBehaviour
 
         
     }
+
+    void ShootProjectile()
+    {
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0f;
+
+        Vector2 shootDir = (mouseWorldPos - firePoint.position).normalized;
+
+        GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        proj.GetComponent<PlayerProjectile>().SetDirection(shootDir);
+    }
+
+
+
     void OnDrawGizmosSelected()
     {
         if (rb == null) return;

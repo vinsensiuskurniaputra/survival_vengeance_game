@@ -168,10 +168,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogue:
-    name: Kesatria Jahat
-    sentences:
-    - wah hebat juga kamu bisa sampai sini
-    - Ayo kita bertarung !
+    conversationLines: []
+  changeMusicOnTrigger: 0
+  newBackgroundMusic: {fileID: 0}
+  OnTriggered:
+    m_PersistentCalls:
+      m_Calls: []
   OnDialogueFinish:
     m_PersistentCalls:
       m_Calls:
@@ -2371,6 +2373,56 @@ RectTransform:
   m_AnchoredPosition: {x: -75, y: -0.00000095367}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &545590413
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 545590415}
+  - component: {fileID: 545590414}
+  m_Layer: 0
+  m_Name: DataPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &545590414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545590413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fa385481c506df4a9e0593d9cad0c6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 50
+  currentHealth: 0
+  exp: 0
+  attackPower: 2
+  moveSpeed: 5
+  items: []
+--- !u!4 &545590415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545590413}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 92.84, y: 106.35, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &615053083
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2382,7 +2434,7 @@ PrefabInstance:
     - target: {fileID: 1617840449814317248, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: healthBar
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 615053085}
     - target: {fileID: 1617840449814317248, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: upgradeManager
       value: 
@@ -2445,6 +2497,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5931886618831928467, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
   m_PrefabInstance: {fileID: 615053083}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &615053085 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5623043004642308394, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
+  m_PrefabInstance: {fileID: 615053083}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d55a7a502381bc4db17a1575a4e84b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &712444658
 GameObject:
   m_ObjectHideFlags: 0
@@ -5332,8 +5395,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossHpBar: {fileID: 269625209}
-  boss: {fileID: 0}
-  player: {fileID: 0}
+  boss: {fileID: 7746195590392313576}
+  player: {fileID: 615053084}
   showDistance: 10
 --- !u!114 &1324729798
 MonoBehaviour:
@@ -7155,11 +7218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogue:
-    name: Axel Pace
-    sentences:
-    - Akhirnya dapa keluar
-    - Heiiii Kamu Kesatria Jahat !!
-    - Akan ku kalahkan kamu
+    conversationLines: []
   OnDialogueFinish:
     m_PersistentCalls:
       m_Calls:
@@ -8060,13 +8119,53 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 7746195590392313576}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: shotsPerCycle
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
       propertyPath: attackCooldown
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: detectionRange
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: delayAfterCycle
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: projectileRange
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 145567532513445424, guid: f7db58becc8b0a143adfc750a177913c, type: 3}
+    - target: {fileID: 1296787398873836958, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: timeBetweenShots
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3673463912472216617, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: spawnInterval
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3889563176689114487, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: dropPoint
+      value: 
+      objectReference: {fileID: 7746195590392313576}
+    - target: {fileID: 3889563176689114487, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: expPrefab
+      value: 
+      objectReference: {fileID: 3582344292871440007, guid: df8629201aeb92942b0045f890120153, type: 3}
     - target: {fileID: 3889563176689114487, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
       propertyPath: healthBar
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1324729797}
     - target: {fileID: 3889563176689114487, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
       propertyPath: maxHealth
       value: 150
@@ -8115,11 +8214,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5361630623428197739, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: m_Size.x
+      value: 1.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361630623428197739, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: m_Size.y
+      value: 3.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361630623428197739, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+      propertyPath: m_Offset.y
+      value: -1.22
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+--- !u!4 &7746195590392313576 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4790382500018634214, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
+  m_PrefabInstance: {fileID: 7746195590392313575}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &8314352000201801561 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3673463912472216617, guid: c08c3613f042201489b6cb7ba9a7006d, type: 3}
@@ -8147,3 +8263,4 @@ SceneRoots:
   - {fileID: 1633068450}
   - {fileID: 384347980}
   - {fileID: 404612554}
+  - {fileID: 545590415}

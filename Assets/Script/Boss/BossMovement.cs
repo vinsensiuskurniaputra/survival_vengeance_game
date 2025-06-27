@@ -19,6 +19,19 @@ public class BossMovement : MonoBehaviour
 
     private Animator animator;
 
+    public GameObject projectilePrefab;
+    public Transform firePoint;
+    public float projectileRange = 5f;
+
+    public int shotsPerCycle = 3;              // jumlah tembakan per siklus
+    public float timeBetweenShots = 0.5f;      // delay antar proyektil
+    public float delayAfterCycle = 2f;         // jeda setelah siklus selesai
+
+    private bool isShooting = false;
+    private int shotsLeft;
+    private float shotTimer;
+
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -45,11 +58,34 @@ public class BossMovement : MonoBehaviour
                 animator.SetBool("IsMoving", false);
         }
 
-        if (distance <= attackRange && Time.time >= lastAttackTime + attackCooldown)
+        if (!isShooting && distance <= projectileRange && Time.time >= lastAttackTime + attackCooldown)
         {
-            Attack();
+            StartRangedAttack();
+        }
+
+        if (isShooting)
+        {
+            shotTimer += Time.deltaTime;
+            if (shotsLeft > 0 && shotTimer >= timeBetweenShots)
+            {
+                shotTimer = 0f;
+                ShootProjectile();
+                shotsLeft--;
+
+                if (shotsLeft == 0)
+                {
+                    isShooting = false;
+                    lastAttackTime = Time.time; // reset delay setelah selesai 1 batch
+                }
+            }
+        }
+
+        if (distance <= attackRange && Time.time >= lastAttackTime + attackCooldown && !isShooting)
+        {
+            MeleeAttack();
         }
     }
+
 
     void FixedUpdate()
     {
@@ -73,7 +109,7 @@ public class BossMovement : MonoBehaviour
             animator.SetBool("IsMoving", true);
     }
 
-    void Attack()
+    void MeleeAttack()
     {
         if (animator != null)
             animator.SetTrigger("Attack");
@@ -87,9 +123,34 @@ public class BossMovement : MonoBehaviour
         }
     }
 
+    void StartRangedAttack()
+    {
+        if (animator != null)
+            animator.SetTrigger("Attack");
+
+        isShooting = true;
+        shotsLeft = shotsPerCycle;
+        shotTimer = timeBetweenShots; // langsung tembak pertama kali
+    }
+
+    void ShootProjectile()
+    {
+        if (projectilePrefab != null && firePoint != null && player != null)
+        {
+            GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+            Vector2 shootDir = (player.position - firePoint.position).normalized;
+            proj.GetComponent<Projectile>().SetDirection(shootDir);
+        }
+    }
+
+
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, projectileRange);
     }
 }

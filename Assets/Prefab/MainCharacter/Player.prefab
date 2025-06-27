@@ -212,6 +212,8 @@ MonoBehaviour:
   attackEffectPrefab: {fileID: 2110542534304619024, guid: 0e36b187e7a36e847ac9c6158f717718, type: 3}
   effectDuration: 0.3
   upgradeManager: {fileID: 0}
+  projectilePrefab: {fileID: 8357438644919148360, guid: 73e197a1aa066f14c9e4d93c2f7d1029, type: 3}
+  firePoint: {fileID: 5931886618831928467}
 --- !u!61 &2028358531057762522
 BoxCollider2D:
   m_ObjectHideFlags: 0

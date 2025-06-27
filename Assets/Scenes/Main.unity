@@ -1940,7 +1940,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 1.7710888e-24, y: -0.000000014205299, z: 2.5158847e-32, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -9.979436}
+  m_LocalPosition: {x: 1, y: 0.5, z: -9.979436}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4996,7 +4996,7 @@ Transform:
   m_GameObject: {fileID: 1155986204}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.000000014205299, z: 1.2467804e-16, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -9.979436}
+  m_LocalPosition: {x: 1, y: 0.5, z: -9.979436}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23373,20 +23373,40 @@ PrefabInstance:
       value: Boss1
       objectReference: {fileID: 0}
     - target: {fileID: 5381141000007604091, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: dropPoint
+      value: 
+      objectReference: {fileID: 1265991774}
+    - target: {fileID: 5381141000007604091, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: expPrefab
+      value: 
+      objectReference: {fileID: 3582344292871440007, guid: df8629201aeb92942b0045f890120153, type: 3}
+    - target: {fileID: 5381141000007604091, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
       propertyPath: healthBar
       value: 
       objectReference: {fileID: 1654760545}
-    - target: {fileID: 5381141000007604091, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
-      propertyPath: maxHealth
-      value: 100
+    - target: {fileID: 7842786255661605918, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 1265991774}
+    - target: {fileID: 7842786255661605918, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: shotsPerCycle
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7842786255661605918, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
-      propertyPath: damage
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 4173853875829434046, guid: 649b6befe5e75874eba596d5ef2311dc, type: 3}
     - target: {fileID: 7842786255661605918, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
-      propertyPath: detectionRange
-      value: 20
+      propertyPath: timeBetweenShots
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7906941838816863816, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: m_Size.x
+      value: 2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7906941838816863816, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
+      propertyPath: m_Size.y
+      value: 2.52
       objectReference: {fileID: 0}
     - target: {fileID: 8171883971524102126, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
       propertyPath: m_LocalPosition.x
@@ -23432,10 +23452,6 @@ PrefabInstance:
       propertyPath: isActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8314352001087307205, guid: 415f32c61449286468fb0ca0c3744b14, type: 3}
-      propertyPath: spawnInterval
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -23450,6 +23466,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1617840449814317248, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 1469522551}
+    - target: {fileID: 1617840449814317248, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: healthBar
       value: 
       objectReference: {fileID: 536502804}
@@ -23457,6 +23477,10 @@ PrefabInstance:
       propertyPath: upgradeManager
       value: 
       objectReference: {fileID: 1890339055}
+    - target: {fileID: 1617840449814317248, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 8357438644919148360, guid: 73e197a1aa066f14c9e4d93c2f7d1029, type: 3}
     - target: {fileID: 4896396702000419876, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: m_Name
       value: Player
@@ -23467,11 +23491,11 @@ PrefabInstance:
       objectReference: {fileID: 536502802}
     - target: {fileID: 5931886618831928467, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5931886618831928467, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5931886618831928467, guid: 0ca059c031a07b04b9790edd3da53532, type: 3}
       propertyPath: m_LocalPosition.z
