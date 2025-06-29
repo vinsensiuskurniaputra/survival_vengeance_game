@@ -3789,13 +3789,15 @@ MonoBehaviour:
   dialogue:
     conversationLines:
     - speakerName: Axel Pace
-      text: ...
+      text: ...ugh... kepala ku...
     - speakerName: Axel Pace
-      text: Dimana ini
+      text: ...gelap... lembab... bau besi.
     - speakerName: Axel Pace
-      text: '?! '
+      text: ?! Tangan ini... bukan... bukan tanganku.
     - speakerName: Axel Pace
-      text: Kenapa aku jadi hitam?
+      text: Kerajaan... eksperimen itu... Mereka mengubahku!.
+    - speakerName: Axel Pace
+      text: PEMBERONTAK... Mereka akan membayar ini.
   OnDialogueFinish:
     m_PersistentCalls:
       m_Calls:
@@ -4644,14 +4646,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogue:
     conversationLines:
-    - speakerName: Axel Pace
-      text: Kamu Penyihir Api dari kerajaan??
-    - speakerName: Axel Pace
-      text: Kenapa kamu disini
     - speakerName: Penyihir Api
-      text: ?!
+      text: "Hah! Tahanan rendahan mana yang berani\u2014 Tunggu... Subjek Eksperimen
+        7?"
     - speakerName: Penyihir Api
-      text: Kamu kenapa bisa keluar
+      text: Tidak mungkin! Seharusnya kau membusuk di selmu! Bagaimana kau bisa keluar?!
+    - speakerName: Axel Pace
+      text: Sipir. Kau yang pertama.
   changeMusicOnTrigger: 1
   newBackgroundMusic: {fileID: 8300000, guid: 330954cafc9d97d4dafb1bba18b8bfcf, type: 3}
   OnTriggered:
@@ -4739,7 +4740,7 @@ Transform:
   m_GameObject: {fileID: 1099017639}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 92.5, y: 86.5, z: -1}
+  m_LocalPosition: {x: 92.5, y: 91.91, z: -1}
   m_LocalScale: {x: 52.45, y: 33.06, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
